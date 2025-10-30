@@ -60,12 +60,7 @@
           <div class="muted">라운드 먼저 <b>목표 점수</b>에 도달하면 승리! (동점 시 서든데스)</div>
         </div>
         <div class="panel">
-          <div class="seg" role="group" aria-label="목표 점수">
-            <button data-target="1">1</button>
-            <button data-target="3" aria-pressed="true">3</button>
-            <button data-target="5">5</button>
-            <button data-target="7">7</button>
-          </div>
+          <div class="hint">총 5판 중 3판 이상 이기면 도장 지급!</div>
           <button id="reset" class="seg" title="게임 초기화"><span style="font-weight:800">↻ 재시작</span></button>
         </div>
       </div>
@@ -99,7 +94,7 @@
 
       <div class="box" style="margin-top:12px">
         <div class="row" style="justify-content:space-between; align-items:center">
-          <div class="hint">🎯 기준: 목표 점수에 먼저 도달하면 <b>도장</b> 지급. 1등 기록자는 운영진 확인.</div>
+          <div class="hint">🎯 총 5판 중 3판 이상 승리 시<b>도장</b> 지급. <br> 5판 모두 승리한 <b>선착순 1명</b>에게 특별 선물!(부스로 찾아오세요)</div>
           <button id="share" class="seg" title="현재 설정 공유">링크 공유</button>
         </div>
       </div>
@@ -134,7 +129,9 @@
   syncTargetButtons(target);
   needEl.textContent = target;
 
+  let rounds = 0;
   let you=0, cpu=0, locked=false;
+  const tatalRounds = 5;
 
   function cpuChoice(){
     const arr=['R','P','S'];
@@ -146,13 +143,14 @@
     return -1; // you lose
   }
   function updateScore(){
-    scoreEl.textContent = `${you} : ${cpu}`;
-    if(you>=target && you-cpu>=1){
-      finish('승리! 도장 지급 😊', 'r-win');
-    }else if(cpu>=target && cpu-you>=1){
-      finish('패배… 다음 기회에 😅', 'r-lose');
-    }else if(you===target-1 && cpu===target-1){
-      resultEl.innerHTML = '<span class="r-draw">서든데스!</span>';
+    rounds++;
+    scoreEl.textContent = `${you} : ${cpu}(${rounds}/5)`;
+    if (rounds === totalRounds) {
+      if (you >= 3) {
+        finish('🎉축하합니다! 도장을 받으러 오세요', 'r-win');
+      } else {
+        finish('다시 도전해보세요😢','r-lose');
+      }
     }
   }
   function finish(text, cls){
@@ -190,3 +188,4 @@
 </script>
 </body>
 </html>
+
