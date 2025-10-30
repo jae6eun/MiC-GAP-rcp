@@ -113,79 +113,87 @@
   const cpuPick = document.getElementById('cpuPick');
   const scoreEl = document.getElementById('score');
   const resultEl = document.getElementById('result');
-  const needEl = document.getElementById('need');
   const resetBtn = document.getElementById('reset');
   const shareBtn = document.getElementById('share');
-  const targetSeg = document.querySelectorAll('.seg[role="group"] button');
 
   const map = {R:'바위', P:'보', S:'가위'};
   const badge = (cls, txt)=> `<span class="badge ${cls}">${txt}</span>`;
-  const pickBadgeClass = (x)=> ({R:'b-draw',P:'b-draw',S:'b-draw'})[x] || 'b-draw';
 
-  // read query
-  const params = new URLSearchParams(location.search);
-  let target = parseInt(params.get('target')||'3',10);
-  if (![1,3,5,7].includes(target)) target = 3;
-  syncTargetButtons(target);
-  needEl.textContent = target;
-
-  let rounds = 0;
-  let you=0, cpu=0, locked=false;
-  const tatalRounds = 5;
+  // 기본 값
+  let you = 0, cpu = 0, rounds = 0;
+  const totalRounds = 5;
+  let locked = false;
 
   function cpuChoice(){
-    const arr=['R','P','S'];
-    return arr[Math.floor(Math.random()*3)];
-  }
-  function decide(a,b){
-    if(a===b) return 0; // draw
-    if((a==='R'&&b==='S')||(a==='S'&&b==='P')||(a==='P'&&b==='R')) return 1; // you win
-    return -1; // you lose
-  }
-  function updateScore(){
-    rounds++;
-    scoreEl.textContent = `${you} : ${cpu}(${rounds}/5)`;
-    if (rounds === totalRounds) {
-      if (you >= 3) {
-        finish('🎉축하합니다! 도장을 받으러 오세요', 'r-win');
-      } else {
-        finish('다시 도전해보세요😢','r-lose');
-      }
-    }
-  }
-  function finish(text, cls){
-    locked=true; resultEl.className='result big '+cls; resultEl.textContent=text;
+    const arr = ['R','P','S'];
+    return arr[Math.floor(Math.random() * 3)];
   }
 
-  btns.forEach(b=>b.addEventListener('click',()=>{
-    if(locked) return; // finished
+  function decide(a, b){
+    if (a === b) return 0; // 무승부
+    if ((a === 'R' && b === 'S') || (a === 'S' && b === 'P') || (a === 'P' && b === 'R')) return 1; // 이김
+    return -1; // 짐
+  }
+
+  function updateDisplay(){
+    scoreEl.textContent = `${you} : ${cpu} (${rounds}/${totalRounds})`;
+  }
+
+  function finish(message, cls){
+    locked = true;
+    resultEl.className = 'result big ' + cls;
+    resultEl.textContent = message;
+  }
+
+  btns.forEach(b => b.addEventListener('click', () => {
+    if (locked) return; // 게임이 끝나면 클릭 막기
+
     const youC = b.dataset.choice;
     const cpuC = cpuChoice();
-    youPick.innerHTML = badge(pickBadgeClass(youC), map[youC]);
-    cpuPick.innerHTML = badge(pickBadgeClass(cpuC), map[cpuC]);
+
+    youPick.innerHTML = badge('b-draw', map[youC]);
+    cpuPick.innerHTML = badge('b-draw', map[cpuC]);
+
     const r = decide(youC, cpuC);
-    if(r===1){ you++; resultEl.className='result big r-win'; resultEl.textContent='이겼다!'; }
-    else if(r===-1){ cpu++; resultEl.className='result big r-lose'; resultEl.textContent='졌어요'; }
-    else { resultEl.className='result big r-draw'; resultEl.textContent='비겼다'; }
-    updateScore();
+    if (r === 1) { you++; resultEl.className = 'result big r-win'; resultEl.textContent = '이겼다!'; }
+    else if (r === -1) { cpu++; resultEl.className = 'result big r-lose'; resultEl.textContent = '졌어요'; }
+    else { resultEl.className = 'result big r-draw'; resultEl.textContent = '비겼다'; }
+
+    rounds++;
+    updateDisplay();
+
+    if (rounds === totalRounds) {
+      if (you === 5) {
+        finish('🎯 5전 전승! 선착순 1등입니다 🏆', 'r-win');
+      } else if (you >= 3) {
+        finish('🎉 축하합니다! 도장 지급 😊', 'r-win');
+      } else {
+        finish('😅 아쉽지만 다음 기회에…', 'r-lose');
+      }
+    }
   }));
 
-  resetBtn.addEventListener('click',()=>{ you=0; cpu=0; locked=false; scoreEl.textContent='0 : 0'; resultEl.textContent=''; youPick.innerHTML='–'; cpuPick.innerHTML='–'; });
+  resetBtn.addEventListener('click', () => {
+    you = 0; cpu = 0; rounds = 0; locked = false;
+    youPick.innerHTML = '–';
+    cpuPick.innerHTML = '–';
+    scoreEl.textContent = '0 : 0 (0/5)';
+    resultEl.textContent = '';
+  });
 
-  function syncTargetButtons(t){
-    targetSeg.forEach(el=>{ el.setAttribute('aria-pressed', String(el.dataset.target==t)); });
-  }
-  targetSeg.forEach(el=> el.addEventListener('click',()=>{
-    target = parseInt(el.dataset.target,10); syncTargetButtons(target); needEl.textContent=target; const u=new URL(location.href); u.searchParams.set('target', String(target)); history.replaceState({},'',u);
-    resetBtn.click();
-  }));
-
-  shareBtn.addEventListener('click', async ()=>{
+  shareBtn.addEventListener('click', async () => {
     const url = location.href.split('#')[0];
-    try{ await navigator.clipboard.writeText(url); shareBtn.textContent='링크 복사됨'; setTimeout(()=>shareBtn.textContent='링크 공유',1400);}catch(e){ alert('링크: '+url); }
+    try {
+      await navigator.clipboard.writeText(url);
+      shareBtn.textContent = '링크 복사됨';
+      setTimeout(() => shareBtn.textContent = '링크 공유', 1400);
+    } catch (e) {
+      alert('링크: ' + url);
+    }
   });
 })();
 </script>
 </body>
 </html>
+
 
