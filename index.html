@@ -100,75 +100,13 @@
       </div>
 
       <div class="foot" style="margin-top:10px">
-        <div>© Ajou Math MiC | 부스용 웹게임</div>
-        <div class="qr">설정 저장/공유: URL 파라미터 <code>?target=3</code></div>
+        <div>© Ajou Math MiC </div>
       </div>
     </div>
   </div>
 
 <script>
-(function(){
-  const btns = document.querySelectorAll('button.choice');
-  const youPick = document.getElementById('youPick');
-  const cpuPick = document.getElementById('cpuPick');
-  const scoreEl = document.getElementById('score');
-  const resultEl = document.getElementById('result');
-  const resetBtn = document.getElementById('reset');
-  const shareBtn = document.getElementById('share');
-
-  const map = {R:'바위', P:'보', S:'가위'};
-  const badge = (cls, txt)=> `<span class="badge ${cls}">${txt}</span>`;
-
-  // 기본 값
-  let you = 0, cpu = 0, rounds = 0;
-  const totalRounds = 5;
-  let locked = false;
-
-  function cpuChoice(){
-    const arr = ['R','P','S'];
-    return arr[Math.floor(Math.random() * 3)];
-  }
-
-  function decide(a, b){
-    if (a === b) return 0; // 무승부
-    if ((a === 'R' && b === 'S') || (a === 'S' && b === 'P') || (a === 'P' && b === 'R')) return 1; // 이김
-    return -1; // 짐
-  }
-
-  function updateDisplay(){
-    scoreEl.textContent = `${you} : ${cpu} (${rounds}/${totalRounds})`;
-  }
-
-  function finish(message, cls){
-    locked = true;
-    resultEl.className = 'result big ' + cls;
-    resultEl.textContent = message;
-  }
-
-  btns.forEach(b => b.addEventListener('click', () => {
-    if (locked) return; // 게임이 끝나면 클릭 막기
-
-    const youC = b.dataset.choice;
-    const cpuC = cpuChoice();
-
-    youPick.innerHTML = badge('b-draw', map[youC]);
-    cpuPick.innerHTML = badge('b-draw', map[cpuC]);
-
-    const r = decide(youC, cpuC);
-    if (r === 1) { you++; resultEl.className = 'result big r-win'; resultEl.textContent = '이겼다!'; }
-    else if (r === -1) { cpu++; resultEl.className = 'result big r-lose'; resultEl.textContent = '졌어요'; }
-    else { resultEl.className = 'result big r-draw'; resultEl.textContent = '비겼다'; }
-
-    rounds++;
-    updateDisplay();
-
-    if (rounds === totalRounds) {
-      if (you === 5) {
-        finish('🎯 5전 전승! 선착순 1등입니다 🏆', 'r-win');
-      } else if (you >= 3) {
-        finish('🎉 축하합니다! 도장 지급 😊', 'r-win');
-      } else {
-        finish('😅 아쉽지만 다음 기회에…', 'r-lose');
+(funct요', 'r-lose');
       }
     }
   }));
@@ -195,6 +133,7 @@
 </script>
 </body>
 </html>
+
 
 
 
